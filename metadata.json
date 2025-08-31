@@ -1,0 +1,5 @@
+{
+  "name": "Glimmer",
+  "description": "An application that generates beautiful and inspiring quote images based on user prompts. It finds a relevant quote, generates a fitting background image, and selects an appropriate font, all powered by AI.",
+  "requestFramePermissions": []
+}
