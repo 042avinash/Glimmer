@@ -17,7 +17,12 @@ export const QuoteDisplay = forwardRef<HTMLDivElement, QuoteDisplayProps>(({ quo
         ref={ref} 
         className="w-full max-w-2xl aspect-square relative overflow-hidden rounded-xl shadow-2xl bg-black flex items-center justify-center p-8 sm:p-12"
       >
-        <img src={imageUrl} alt="AI generated background" className="absolute top-0 left-0 w-full h-full object-cover" />
+        <img
+        src={imageUrl}
+        alt="AI generated background"
+        className="absolute top-0 left-0 w-full h-full object-cover"
+        crossOrigin="anonymous"
+      />
         <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50"></div>
         <div className="relative text-center z-10 text-white flex flex-col items-center">
           <p className={`text-3xl md:text-4xl lg:text-5xl leading-tight drop-shadow-lg ${fontClass}`}>

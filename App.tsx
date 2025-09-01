@@ -6,9 +6,11 @@ import { LoadingSpinner } from './components/LoadingSpinner';
 import { SavedQuotesModal } from './components/SavedQuotesModal';
 import { generateQuoteDetails, generateQuoteImage } from './services/geminiService';
 import type { GeneratedQuote, QuoteDetails, SavedQuote } from './types';
+import * as htmlToImage from 'html-to-image';
+
 
 // Declare htmlToImage as it's loaded from a script in index.html
-declare const htmlToImage: any;
+//declare const htmlToImage: any;
 
 const mapFontSuggestionToClass = (suggestion: string): string => {
   const s = suggestion.toLowerCase();
@@ -89,24 +91,36 @@ function App() {
     }
   }, []);
   
-  const handleDownload = useCallback(() => {
-    if (!quoteDisplayRef.current) {
-      setError("Cannot download image. Reference not found.");
-      return;
-    }
-    htmlToImage.toPng(quoteDisplayRef.current, { cacheBust: true, })
-      .then((dataUrl: string) => {
-        const link = document.createElement('a');
-        link.download = 'quote-image.png';
-        link.href = dataUrl;
-        link.click();
-      })
-      .catch((err: Error) => {
-        console.error('oops, something went wrong!', err);
-        setError("Failed to generate image for download.");
-      });
-  }, []);
+const handleDownload = useCallback(() => {
+  if (!quoteDisplayRef.current) {
+    setError("Cannot download image. Reference not found.");
+    return;
+  }
+
+  const img = quoteDisplayRef.current.querySelector('img');
   
+  // If image exists and is not loaded, wait for it
+  if (img && !img.complete) {
+    img.onload = () => handleDownload(); // retry after load
+    img.onerror = () => setError("Failed to load background image.");
+    return;
+  }
+
+  // Skip fonts to avoid Google Fonts security issues
+  htmlToImage.toPng(quoteDisplayRef.current, { cacheBust: true, skipFonts: true })
+    .then((dataUrl: string) => {
+      const link = document.createElement('a');
+      link.download = 'quote-image.png';
+      link.href = dataUrl;
+      link.click();
+    })
+    .catch((err: Error) => {
+      console.error('oops, something went wrong!', err);
+      setError("Failed to generate image for download.");
+    });
+}, []);
+
+
   const saveQuote = useCallback((quote: GeneratedQuote) => {
     const newQuote: SavedQuote = {
       ...quote,
